@@ -5,7 +5,7 @@
 
 > ⚡ **Stop wasting time switching to ChatGPT!** BB-Reformater lets you rewrite text directly from any webpage with a single click.
 
-A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantly improve your reports and communications without leaving your workflow.
+A Browser extension built by bug bounty hunters, for bug bounty hunters. Instantly improve your reports and communications without leaving your workflow.
 
 ### ✨ Key Benefits:s
 - **No more copy-pasting** to external tools
@@ -33,7 +33,7 @@ A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantl
 
 ### ⚙️ Technical Details
 
-- **AI Model**: Gemini 2.5 Pro Preview 05-06
+- **AI Model**: Gemini 2.0 Flash
 - **Privacy**: Your data is only sent to Gemini API
 - **Compatibility**: Works on all major bug bounty platforms
 - **Lightweight**: Minimal impact on browser performance
@@ -59,36 +59,16 @@ A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantl
    - Enable "Developer mode" (top-right)
    - Click "Load unpacked" and select the `bb-reformater` directory
 
-🎉 Done! The extension is ready to use.
+### 🦊 Firefox Installation (Easier!)
+
+1. **Download from Firefox Add-ons**:
+   - Visit [BB-Reformater on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/bb-reformater/)
+   - Click "Add to Firefox"
+   - Confirm the installation when prompted
+
+🎉 Done! The extension is ready to use in Firefox.
+
 🚫 No more switching tabs or copy-pasting to ChatGPT!
-
-## 🛠️ Development
-
-### Project Structure
-```
-bb-reformater/
-├── background.js        # Handles API communication
-├── content.js          # Manages text selection
-├── popup.js            # Popup interface logic
-├── popup.html          # Popup UI
-├── manifest.json       # Extension config
-└── icon/               # Extension icons
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
-```
-
-### Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 

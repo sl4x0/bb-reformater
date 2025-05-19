@@ -163,7 +163,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 
                 if (!success) {
                     success = handleStandardContentEditable(newText);
-                }
+                    }
             } else if (!errorMessage) {
                 errorMessage = ERROR_MESSAGES.NO_SELECTION;
             }
@@ -179,8 +179,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (isTwitterDomain() && (errorMessage === ERROR_MESSAGES.NO_ACTIONABLE_SELECTION || errorMessage === ERROR_MESSAGES.NO_SELECTION)) {
                 alert("Twitter text replacement failed. Please copy the text below and paste it manually:\n\n" + newText);
             } else if (errorMessage.startsWith(ERROR_MESSAGES.REPLACEMENT_FAILED.trim())) {
-                alert("Failed to automatically replace text. Please copy the text below and paste it manually:\n\n" + newText);
-            }
+                    alert("Failed to automatically replace text. Please copy the text below and paste it manually:\n\n" + newText);
+                }
             
             sendResponse({ success: false, error: errorMessage });
         }

@@ -1,7 +1,7 @@
-// Function to be injected into frames to get selected text
-function getSelectionFromFrame() {
-    return window.getSelection().toString().trim();
-}
+    // Function to be injected into frames to get selected text
+    function getSelectionFromFrame() {
+        return window.getSelection().toString().trim();
+    }
 
 // Helper functions
 function updateSubmitButton(hasSelectedText) {
@@ -117,25 +117,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     reject(new Error("Request timed out. Please try again."));
                 }, 30000); // 30 second timeout
 
-                chrome.runtime.sendMessage(
-                    {
-                        action: "rewriteText",
-                        selectedText: currentSelectedText,
+        chrome.runtime.sendMessage(
+            {
+                action: "rewriteText",
+                selectedText: currentSelectedText,
                         userPrompt: finalPrompt,
                         frameId: sourceFrameId
-                    },
-                    (response) => {
+            },
+            (response) => {
                         clearTimeout(messageTimeout);
-                        if (chrome.runtime.lastError) {
+                if (chrome.runtime.lastError) {
                             reject(chrome.runtime.lastError);
-                        } else {
+                    } else {
                             resolve(response);
                         }
                     }
                 );
             });
 
-            if (response.success) {
+                    if (response.success) {
                 // Get the text from the correct path in Gemini's response
                 const responseText = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text || '';
                 // Remove any surrounding quotes from the response text
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
                 // Optionally close popup after success
                 setTimeout(() => window.close(), 1500);
-            } else {
+                } else {
                 let displayErrorMsg = response.error || 'Unknown error from background.';
                 if (displayErrorMsg.startsWith("API Error 5")) {
                     displayErrorMsg = "Network error with API—please try again.";
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMessage = "Network error—please try again.";
             } else if (errorMessage.includes("Could not establish connection")) {
                 errorMessage = "Couldn't link up to the page. Maybe try refreshin'?";
-            }
+                }
             displayError(errorMessage);
         } finally {
-            submitBtn.disabled = false;
-        }
+                submitBtn.disabled = false;
+            }
     });
 });
