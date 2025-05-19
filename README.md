@@ -1,13 +1,13 @@
 # 🐞 BB-Reformater: One-Click Text Rewriting for Bug Bounty Hunters
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/bb-reformater?style=social)](https://github.com/yourusername/bb-reformater/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/sl4x0/bb-reformater?style=social)](https://github.com/sl4x0/bb-reformater/stargazers)
 
 > ⚡ **Stop wasting time switching to ChatGPT!** BB-Reformater lets you rewrite text directly from any webpage with a single click.
 
 A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantly improve your reports and communications without leaving your workflow.
 
-### ✨ Key Benefits:
+### ✨ Key Benefits:s
 - **No more copy-pasting** to external tools
 - **One-click rewriting** of any selected text
 - **Works everywhere** - forms, textareas, and rich text editors
