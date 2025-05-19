@@ -60,20 +60,9 @@ A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantl
    - Click "Load unpacked" and select the `bb-reformater` directory
 
 🎉 Done! The extension is ready to use.
-
-## 🎥 Quick Demo
-
-1. Select text on any webpage
-2. Click the BB-Reformater icon
-3. Add instructions (optional)
-4. Click "Rewrite"
-5. Your improved text appears instantly
-
-No more switching tabs or copy-pasting to ChatGPT!
+🚫 No more switching tabs or copy-pasting to ChatGPT!
 
 ## 🛠️ Development
-
-## 🏗️ For Developers
 
 ### Project Structure
 ```
@@ -100,8 +89,6 @@ bb-reformater/
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 ---
 
