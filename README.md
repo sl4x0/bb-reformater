@@ -1,4 +1,4 @@
-# 🐞 BB-Reformater: One-Click Text Rewriting for Bug Bounty Hunters
+# BB-Reformater: One-Click Text Rewriting for Bug Bounty Hunters
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/sl4x0/bb-reformater?style=social)](https://github.com/sl4x0/bb-reformater/stargazers)
@@ -33,7 +33,7 @@ A Chrome extension built by bug bounty hunters, for bug bounty hunters. Instantl
 
 ### ⚙️ Technical Details
 
-- **AI Model**: Google's Gemini 2.0 Flash
+- **AI Model**: Gemini 2.5 Pro Preview 05-06
 - **Privacy**: Your data is only sent to Gemini API
 - **Compatibility**: Works on all major bug bounty platforms
 - **Lightweight**: Minimal impact on browser performance
@@ -104,26 +104,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-Made with ❤️ for the bug bounty community
-</div>
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-Made with ❤️ by @sl4x0
+Made with ❤️ by [@sl4x0](https://x.com/sl4x0) for the bug bounty community
 </div>
