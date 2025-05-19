@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BB-Reformater 🐞</title>
+  <style>
+    body { font-family: sans-serif; width: 300px; padding: 10px; }
+    textarea { width: 95%; min-height: 60px; margin-bottom: 10px; }
+    input[type="text"] { width: 95%; margin-bottom: 10px; }
+    button { width: 100%; padding: 8px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px;}
+  </style>
+</head>
+<body>
+  <h3>Selected Text:</h3>
+  <textarea id="selectedText" readonly></textarea>
+
+  <h3>Your Instruction:</h3>
+  <input type="text" id="userPrompt" placeholder="e.g., Rewrite this more formally">
+
+  <button id="submitBtn">Rewrite</button>
+  <div id="status"></div>
+  <div id="error" class="error"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

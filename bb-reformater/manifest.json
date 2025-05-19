@@ -1,0 +1,33 @@
+{
+    "manifest_version": 3,
+    "name": "BB-Reformater",
+    "version": "1.0",
+    "description": "AI-powered text rewriter for bug bounty hunters. Perfect for non-native English speakers to improve their reports and communications.",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+    ],
+    "host_permissions": [
+      "https://generativelanguage.googleapis.com/*"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "all_frames": true
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon/icon.png"
+    },
+    "icons": {
+      "16": "icon/icon.png",
+      "48": "icon/icon.png",
+      "128": "icon/icon.png"
+    }
+  }
