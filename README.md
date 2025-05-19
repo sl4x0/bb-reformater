@@ -103,6 +103,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
+---
+
 Made with ❤️ by [@sl4x0](https://x.com/sl4x0) for the bug bounty community
-</div>
