@@ -1,25 +1,151 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>BB-Reformater 🐞</title>
-  <style>
-    body { font-family: sans-serif; width: 300px; padding: 10px; }
-    textarea { width: 95%; min-height: 60px; margin-bottom: 10px; }
-    input[type="text"] { width: 95%; margin-bottom: 10px; }
-    button { width: 100%; padding: 8px; }
-    .error { color: red; font-size: 0.9em; margin-top: 5px;}
-  </style>
+    <title>BB-Reformater</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #00ff00;
+            --accent-color: #00ff00;
+            --border-color: #1a1a1a;
+            --input-bg: #1a1a1a;
+            --hover-color: #003300;
+            --error-color: #ff3333;
+            --success-color: #00ff00;
+        }
+
+        body {
+            width: 400px;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group:nth-child(1) {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 0.9em;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea, input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        button {
+            background-color: var(--input-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--hover-color);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--border-color);
+        }
+
+        #status {
+            color: var(--success-color);
+            text-align: center;
+            min-height: 20px;
+        }
+
+        #error {
+            color: var(--error-color);
+            text-align: center;
+            min-height: 20px;
+        }
+
+        /* Glitch effect for status messages */
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00; }
+            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
+            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00; }
+        }
+
+        #status:not(:empty) {
+            animation: glitch 1s linear infinite;
+        }
+    </style>
 </head>
 <body>
-  <h3>Selected Text:</h3>
-  <textarea id="selectedText" readonly></textarea>
-
-  <h3>Your Instruction:</h3>
-  <input type="text" id="userPrompt" placeholder="e.g., Rewrite this more formally">
-
-  <button id="submitBtn">Rewrite</button>
-  <div id="status"></div>
-  <div id="error" class="error"></div>
-  <script src="popup.js"></script>
+    <div class="container">
+        <h1>BB-Reformater</h1>
+        <p style="text-align: center; margin-top: -15px; margin-bottom: 20px; color: var(--accent-color); font-size: 0.9em;">@sl4x0</p>
+        <form id="rewriteForm">
+            <div class="form-group">
+                <label for="selectedText">Selected Text:</label>
+                <textarea id="selectedText" readonly></textarea>
+            </div>
+            <div class="form-group">
+                <label for="userPrompt">Instructions (Optional):</label>
+                <input type="text" id="userPrompt" placeholder="E.g., Make it more professional, Fix grammar, etc.">
+            </div>
+            <button type="submit" id="submitBtn" disabled>Rewrite Text</button>
+        </form>
+        <div id="status" role="status" aria-live="polite"></div>
+        <div id="error" role="alert" aria-live="assertive"></div>
+    </div>
+    <script src="popup.js"></script>
 </body>
 </html>

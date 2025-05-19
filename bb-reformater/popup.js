@@ -1,22 +1,60 @@
+// Function to be injected into frames to get selected text
+function getSelectionFromFrame() {
+    return window.getSelection().toString().trim();
+}
+
+// Helper functions
+function updateSubmitButton(hasSelectedText) {
+    submitBtn.disabled = !hasSelectedText;
+}
+
+function displayError(message) {
+    errorEl.textContent = message;
+    // Add 'active' class to trigger fade-in
+    errorEl.classList.add('active');
+    statusEl.textContent = '';
+    statusEl.classList.remove('active', 'glitching');
+}
+
+function displayStatus(message) {
+    statusEl.textContent = message;
+    // Add 'active' and 'glitching' classes to trigger fade-in and animation
+    statusEl.classList.add('active', 'glitching');
+    errorEl.textContent = '';
+    errorEl.classList.remove('active');
+}
+
+function clearStatus() {
+    statusEl.textContent = '';
+    errorEl.textContent = '';
+    // Remove 'active' class to trigger fade-out
+    statusEl.classList.remove('active', 'glitching');
+    errorEl.classList.remove('active');
+}
+
+// Initialize variables
+let currentSelectedText = '';
+let sourceFrameId = null;
+
+// DOM Elements
+let form, selectedTextEl, userPromptEl, submitBtn, statusEl, errorEl;
+
 document.addEventListener('DOMContentLoaded', () => {
-    const selectedTextEl = document.getElementById('selectedText');
-    const userPromptEl = document.getElementById('userPrompt');
-    const submitBtn = document.getElementById('submitBtn');
-    const statusEl = document.getElementById('status');
-    const errorEl = document.getElementById('error');
+    // Initialize DOM elements
+    form = document.getElementById('rewriteForm');
+    selectedTextEl = document.getElementById('selectedText');
+    userPromptEl = document.getElementById('userPrompt');
+    submitBtn = document.getElementById('submitBtn');
+    statusEl = document.getElementById('status');
+    errorEl = document.getElementById('error');
 
-    let currentSelectedText = '';
-    let sourceFrameId = null; // To store the frameId of the selection
-
-    // Function to be injected into frames to get selected text
-    function getSelectionFromFrame() {
-        return window.getSelection().toString().trim();
-    }
+    // Clear status when user types
+    userPromptEl.addEventListener('input', clearStatus);
 
     // Get selected text from the active tab, checking all frames
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs.length === 0) {
-            errorEl.textContent = "Could not find active tab.";
+            displayError("Could not find active tab.");
             return;
         }
         const tabId = tabs[0].id;
@@ -28,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             (injectionResults) => {
                 if (chrome.runtime.lastError) {
-                    errorEl.textContent = "Error getting text. Make sure you've selected some text on the page.";
+                    displayError("Error getting text. Make sure you've selected some text on the page.");
                     console.error("executeScript error:", chrome.runtime.lastError.message);
                     return;
                 }
@@ -38,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (const frameResult of injectionResults) {
                         if (frameResult.result && typeof frameResult.result === 'string' && frameResult.result.trim() !== '') {
                             foundText = frameResult.result.trim();
-                            sourceFrameId = frameResult.frameId; // Store frameId
-                            break; // Found selected text in one of the frames
+                            sourceFrameId = frameResult.frameId;
+                            break;
                         }
                     }
                 }
@@ -47,76 +85,96 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (foundText) {
                     currentSelectedText = foundText;
                     selectedTextEl.value = foundText;
-                    errorEl.textContent = ''; // Clear any previous error
+                    clearStatus(); // Clear initial status/error
+                    submitBtn.disabled = false; // Enable button when text is selected
                 } else {
-                    selectedTextEl.value = ''; // Clear the textarea
-                    errorEl.textContent = "No text selected on the page or in any iframe.";
+                    selectedTextEl.value = '';
+                    displayError("No text selected on the page or in any iframe.");
+                    submitBtn.disabled = true;
                 }
             }
         );
     });
 
-    submitBtn.addEventListener('click', () => {
-        const prompt = userPromptEl.value.trim();
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
         if (!currentSelectedText) {
-            errorEl.textContent = 'No text was selected.';
-            return;
-        }
-        if (!prompt) {
-            errorEl.textContent = 'Please enter an instruction.';
+            displayError('No text was selected.');
             return;
         }
 
-        statusEl.textContent = 'Processing...';
-        errorEl.textContent = '';
+        const prompt = userPromptEl.value.trim();
+        displayStatus('Processing...');
         submitBtn.disabled = true;
 
-        chrome.runtime.sendMessage(
-            {
-                action: "rewriteText",
-                selectedText: currentSelectedText,
-                userPrompt: prompt,
-                frameId: sourceFrameId // Send frameId
-            },
-            (response) => {
-                if (chrome.runtime.lastError) {
-                    let errMsg = chrome.runtime.lastError.message || "Unknown error during message send.";
-                    if (errMsg.includes("Failed to fetch") || errMsg.includes("net::")) {
-                        errorEl.textContent = "Network error—please try again.";
-                    } else if (errMsg.includes("Could not establish connection. Receiving end does not exist.")) {
-                        errorEl.textContent = "Error: Extension context invalidated. Please reload the extension or tab.";
-                    } else {
-                        errorEl.textContent = `Error: ${errMsg}`;
-                    }
-                    statusEl.textContent = '';
-                    submitBtn.disabled = false;
-                    return;
-                }
-                if (response) {
-                    if (response.success) {
-                        statusEl.textContent = 'Text rewritten!';
-                        // Optionally, close popup or give other feedback
-                        // For instance, the original code had: setTimeout(() => window.close(), 1500);
-                    } else {
-                        let displayError = response.error || 'Unknown error from background.';
-                        // Improved error message parsing from user's code
-                        if (displayError.startsWith("API Error 5")) {
-                            displayError = "Network error with API—please try again.";
-                        } else if (displayError.includes("Content blocked:")) {
-                            // message is already good
-                        } else if (displayError.startsWith("API Error")) {
-                             displayError = displayError.replace(/^API Error \d+: /, ''); // Clean up generic API error prefixes
-                             displayError = displayError.replace(/^Error: /, '');
+        // Use default system prompt if user didn't provide one
+        const finalPrompt = prompt || "Please improve the formatting and clarity of this text while maintaining its original meaning.";
+
+        try {
+            const response = await new Promise((resolve, reject) => {
+                const messageTimeout = setTimeout(() => {
+                    reject(new Error("Request timed out. Please try again."));
+                }, 30000); // 30 second timeout
+
+                chrome.runtime.sendMessage(
+                    {
+                        action: "rewriteText",
+                        selectedText: currentSelectedText,
+                        userPrompt: finalPrompt,
+                        frameId: sourceFrameId
+                    },
+                    (response) => {
+                        clearTimeout(messageTimeout);
+                        if (chrome.runtime.lastError) {
+                            reject(chrome.runtime.lastError);
+                        } else {
+                            resolve(response);
                         }
-                        errorEl.textContent = displayError;
-                        statusEl.textContent = '';
                     }
-                } else {
-                    errorEl.textContent = "No response from background script.";
-                    statusEl.textContent = '';
+                );
+            });
+
+            if (response.success) {
+                // Get the text from the correct path in Gemini's response
+                const responseText = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text || '';
+                // Remove any surrounding quotes from the response text
+                const cleanText = responseText.replace(/^"|"$/g, '');
+
+                displayStatus('Text rewritten!'); // Keep status message for a moment
+
+                // Send the cleaned text back to replace the selection
+                chrome.runtime.sendMessage(
+                    {
+                        action: "replaceSelectedText",
+                        newText: cleanText,
+                        frameId: sourceFrameId
+                    }
+                );
+                // Optionally close popup after success
+                setTimeout(() => window.close(), 1500);
+            } else {
+                let displayErrorMsg = response.error || 'Unknown error from background.';
+                if (displayErrorMsg.startsWith("API Error 5")) {
+                    displayErrorMsg = "Network error with API—please try again.";
+                } else if (displayErrorMsg.includes("Content blocked:")) {
+                    // message is already good
+                } else if (displayErrorMsg.startsWith("API Error")) {
+                    displayErrorMsg = displayErrorMsg.replace(/^API Error \d+: /, '');
+                    displayErrorMsg = displayErrorMsg.replace(/^Error: /, '');
                 }
-                submitBtn.disabled = false;
+                displayError(displayErrorMsg);
             }
-        );
+        } catch (error) {
+            let errorMessage = error.message || "Unknown error occurred.";
+            if (errorMessage.includes("Failed to fetch") || errorMessage.includes("net::")) {
+                errorMessage = "Network error—please try again.";
+            } else if (errorMessage.includes("Could not establish connection")) {
+                errorMessage = "Couldn't link up to the page. Maybe try refreshin'?";
+            }
+            displayError(errorMessage);
+        } finally {
+            submitBtn.disabled = false;
+        }
     });
 });
