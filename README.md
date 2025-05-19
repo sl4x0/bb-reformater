@@ -59,13 +59,6 @@ A Browser extension built by bug bounty hunters, for bug bounty hunters. Instant
    - Enable "Developer mode" (top-right)
    - Click "Load unpacked" and select the `bb-reformater` directory
 
-### 🦊 Firefox Installation (Easier!)
-
-1. **Download from Firefox Add-ons**:
-   - Visit [BB-Reformater on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/bb-reformater/)
-   - Click "Add to Firefox"
-   - Confirm the installation when prompted
-
 🎉 Done! The extension is ready to use in Firefox.
 
 🚫 No more switching tabs or copy-pasting to ChatGPT!
