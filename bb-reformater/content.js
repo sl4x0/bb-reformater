@@ -1,4 +1,5 @@
 // content.js
+console.log('Content script loaded and executing');
 
 // Constants
 const DOMAINS = {

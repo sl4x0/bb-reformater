@@ -1,10 +1,102 @@
 // Configuration - Set your Gemini API key here
 // Get your API key from: https://makersuite.google.com/app/apikey
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
+const GEMINI_API_KEY = 'GEMINI_API_KEY';
 
 // Don't edit below this line
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+// Handle content script injection and message sending
+async function injectAndSendMessage(tabId, frameId, rewrittenText, sendResponse) {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) {
+      sendResponse({ success: false, error: "No active tab found to replace text." });
+      return;
+    }
+    
+    const messageOptions = frameId !== null && frameId !== undefined ? { frameId } : {};
+    
+    // Prepare the injection target
+    const execScriptTarget = { tabId };
+    if (frameId !== null && frameId !== undefined && frameId !== 0) {
+      execScriptTarget.frameIds = [frameId];
+    }
+    
+    console.log("Injecting content script with target:", execScriptTarget);
+    
+    // Inject the content script
+    await chrome.scripting.executeScript({
+      target: execScriptTarget,
+      files: ['content.js']
+    });
+    
+    console.log("Content script injected, waiting for initialization...");
+    
+    // Small delay to ensure content script is ready
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    console.log("Sending message with options:", messageOptions);
+    
+    const message = {
+      action: "replaceSelectedText",
+      newText: rewrittenText
+    };
+    
+    console.log("Sending message:", message);
+    
+    // Send message with timeout
+    const response = await new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        resolve({ error: "Content script response timeout" });
+      }, 5000);
+      
+      chrome.tabs.sendMessage(
+        tabId, 
+        message,
+        messageOptions,
+        (response) => {
+          clearTimeout(timeoutId);
+          resolve(response || {});
+        }
+      );
+    });
+    
+    if (chrome.runtime.lastError) {
+      throw new Error(chrome.runtime.lastError.message);
+    }
+    
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    
+    if (response.success) {
+      sendResponse({ success: true });
+    } else {
+      let detail = response.error || "Content script failed to replace text or no suitable element found.";
+      if (detail === "No actionable selection in this frame.") {
+        detail = "Could not find the selected text on the page to replace it. It might have changed or is in a different frame.";
+      }
+      throw new Error(detail);
+    }
+    
+  } catch (error) {
+    console.error("Error in content script communication:", error);
+    let errorMessage = error.message || "Unknown error";
+    
+    if (errorMessage.includes("Could not establish connection")) {
+      errorMessage = "Failed to connect to the page content. Try reloading the tab.";
+    } else if (errorMessage.includes("inject content script")) {
+      errorMessage = "Failed to inject content script. Please try reloading the page.";
+    }
+    
+    sendResponse({ 
+      success: false, 
+      error: errorMessage 
+    });
+  }
+}
+
+// Main message listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
     case "rewriteText":
@@ -87,35 +179,23 @@ Selected Text:
               data.candidates[0].content.parts.length > 0) {
               const rewrittenText = data.candidates[0].content.parts[0].text;
 
+              console.log("Preparing to send message to content script...");
+              
+              // Get the active tab
               chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                if (tabs.length > 0) {
-                  const messageOptions = frameId !== null && frameId !== undefined ? { frameId: frameId } : {};
-                  chrome.tabs.sendMessage(tabs[0].id, {
-                    action: "replaceSelectedText",
-                    newText: rewrittenText
-                  }, messageOptions, (responseFromContent) => {
-                    if (chrome.runtime.lastError) {
-                      console.error("Error sending to content script for replacement:", chrome.runtime.lastError.message);
-                      let detailError = chrome.runtime.lastError.message;
-                      if (detailError && detailError.includes("Could not establish connection")) {
-                        sendResponse({ success: false, error: "Failed to connect to the page content. Try reloading the tab." });
-                      } else {
-                        sendResponse({ success: false, error: "Failed to communicate with content script for replacement: " + detailError });
-                      }
-                    } else if (responseFromContent && responseFromContent.success) {
-                      sendResponse({ success: true });
-                    } else {
-                      let detail = (responseFromContent && responseFromContent.error) ? responseFromContent.error : "Content script failed to replace text or no suitable element found.";
-                      if (detail === "No actionable selection in this frame.") {
-                        detail = "Could not find the selected text on the page to replace it. It might have changed or is in a different frame.";
-                      }
-                      sendResponse({ success: false, error: detail });
-                    }
-                  });
-                } else {
+                if (tabs.length === 0) {
                   sendResponse({ success: false, error: "No active tab found to replace text." });
+                  return;
                 }
+                
+                const tabId = tabs[0].id;
+                
+                // Call the helper function to handle injection and messaging
+                injectAndSendMessage(tabId, frameId, rewrittenText, sendResponse);
               });
+              
+              // Return true to indicate we'll respond asynchronously
+              return true;
             } else {
               let errorMessage = "No valid text found in API response.";
               if (data.promptFeedback && data.promptFeedback.blockReason) {
