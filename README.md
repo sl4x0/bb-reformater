@@ -7,12 +7,13 @@
 
 A Browser extension built by bug bounty hunters, for bug bounty hunters. Instantly improve your reports and communications without leaving your workflow.
 
-### ✨ Key Benefits:s
+### ✨ Key Benefits:
 - **No more copy-pasting** to external tools
 - **One-click rewriting** of any selected text
 - **Works everywhere** - forms, textareas, and rich text editors
-- **Lightning fast** - get polished text in seconds
+- **Lightning fast** - powered by Gemini 2.0 Flash
 - **Privacy focused** - your data stays on your machine until sent to Gemini API
+- **Optimized for security** - preserves technical terms and CVE numbers
 
 💡 **Perfect for non-native English speakers** who want to sound professional in their bug reports and communications.
 
@@ -33,10 +34,11 @@ A Browser extension built by bug bounty hunters, for bug bounty hunters. Instant
 
 ### ⚙️ Technical Details
 
-- **AI Model**: Gemini 2.0 Flash
+- **AI Model**: Gemini 2.0 Flash (Latest)
 - **Privacy**: Your data is only sent to Gemini API
 - **Compatibility**: Works on all major bug bounty platforms
 - **Lightweight**: Minimal impact on browser performance
+- **Optimized**: Streamlined message flow and robust error handling
 
 ## 🛠️ Installation (30 Seconds)
 
@@ -51,7 +53,7 @@ A Browser extension built by bug bounty hunters, for bug bounty hunters. Instant
    cd bb-reformater/bb-reformater  # Go to extension directory
    
    # Edit `background.js` and add your API key
-   # (Look for 'YOUR_API_KEY_HERE' near the top of the file)
+   # (Look for 'GEMINI_API_KEY' near the top of the file)
    ```
 
 3. **Load in Chrome**:
@@ -59,9 +61,18 @@ A Browser extension built by bug bounty hunters, for bug bounty hunters. Instant
    - Enable "Developer mode" (top-right)
    - Click "Load unpacked" and select the `bb-reformater` directory
 
-🎉 Done! The extension is ready to use in Firefox.
+🎉 Done! The extension is ready to use.
 
 🚫 No more switching tabs or copy-pasting to ChatGPT!
+
+## 🔄 Latest Updates
+
+- Upgraded to Gemini 2.0 Flash model for better performance
+- Improved text replacement reliability
+- Enhanced error handling and user feedback
+- Optimized prompt engineering for better results
+- Streamlined message flow between components
+- Added proper generation configuration for consistent output
 
 ---
 
